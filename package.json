@@ -1,6 +1,6 @@
 {
   "name": "capacitor-play-games-services",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Capacitor Play Games Services is a native Google Play Games Services implementation for Android.",
   "main": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -32,9 +32,6 @@
     "native"
   ],
   "capacitor": {
-    "ios": {
-      "src": "ios"
-    },
     "android": {
       "src": "android"
     }

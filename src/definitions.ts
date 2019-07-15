@@ -1,4 +1,4 @@
-declare module "@capacitor/core" {
+declare global {
   interface PluginRegistry {
     PlayGames: PlayGamesPlugin;
   }
