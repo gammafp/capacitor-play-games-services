@@ -11,6 +11,13 @@
     "prepublishOnly": "npm run build"
   },
   "author": "Francisco Pereira Alvarado",
+  "contributors": [
+    {
+      "name": "Jhon Arlex Ocampo Cifuentes",
+      "email": "jhon.ocampo123@gmail.com",
+      "url": "http://jhonocampo.com/"
+    }
+  ],
   "license": "MIT",
   "dependencies": {
     "@capacitor/core": "latest"
