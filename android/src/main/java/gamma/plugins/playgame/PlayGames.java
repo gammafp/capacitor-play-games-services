@@ -1,11 +1,11 @@
 package gamma.plugins.playgame;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.view.Gravity;
+import android.util.Log;
 
+import com.getcapacitor.JSObject;
 import com.getcapacitor.NativePlugin;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -17,8 +17,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.games.Games;
-import com.google.android.gms.games.PlayersClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -27,13 +25,12 @@ public class PlayGames extends Plugin {
 
     static final int REQUEST_SIGN_IN = 10001;
     private PlayGamesUtils playGamesUtils;
-    private PlayersClient mPlayersClient;
     
     @PluginMethod()
     public void signInSilently(final PluginCall call) {
         
         saveCall(call);
-        playGamesUtils = new PlayGamesUtils(call);
+        playGamesUtils = new PlayGamesUtils((Activity) this.getBridge().getContext(), call);
         
         // Obtenemos el tipo de login google o google games
         GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
@@ -41,15 +38,10 @@ public class PlayGames extends Plugin {
         
         // Comprobamos si ya se ha hecho login anteriormente
         if(GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray())) {
-            // Ya se ha hecho login
-            // Obtenemos el login de una cuenta guardada anteriormente
+            // Si ya se ha logeado antes entra acá
             GoogleSignInAccount signedInAccount = account;
-            mPlayersClient = Games.getPlayersClient((Activity) this.getBridge().getContext(), signedInAccount);
-           
-            System.out.println("Bienvenido otra vez");
-            // Mensaje de bienvenida si solo si el usuario ha pasado mucho tiempo desconectado
-            Games.getGamesClient(this.bridge.getContext(), signedInAccount).setGravityForPopups(Gravity.TOP);
-            playGamesUtils.signInSuccess(mPlayersClient);
+            playGamesUtils.signInSuccess(signedInAccount);
+            
         } else {
             // Tratamos de hacer login silencioso primero
             GoogleSignInClient signInClient = GoogleSignIn.getClient(this.bridge.getContext(), signInOptions);
@@ -63,15 +55,13 @@ public class PlayGames extends Plugin {
                             if (task.isSuccessful()) {
                                 // Se hace login y se guarda
                                 GoogleSignInAccount signedInAccount = task.getResult();
+
+                                // Obtenemos los datos del cliente y lo enviamos
+                                playGamesUtils.signInSuccess(signedInAccount);
                                 
                             } else {
-                                System.out.println("no se pudo ingresar silenciosamente");
-                                // NO se pudo hacer login silencioso y se necesita hacer login normal
+                                // No se pudo hacer login silencioso y se necesita hacer login normal
                                 startSignInIntent();
-                                // Player will need to sign-in explicitly using via UI.
-                                // See [sign-in best practices](http://developers.google.com/games/services/checklist) for guidance on how and when to implement Interactive Sign-in,
-                                // and [Performing Interactive Sign-in](http://developers.google.com/games/services/android/signin#performing_interactive_sign-in) for details on how to implement
-                                // Interactive Sign-in.
                             }
                         }
                     }
@@ -81,13 +71,14 @@ public class PlayGames extends Plugin {
     
     private void startSignInIntent() {
         PluginCall saveCall = getSavedCall();
+        
         GoogleSignInClient signInClient = GoogleSignIn.getClient(this.getBridge().getContext(), 
             GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+        
         Intent intent = signInClient.getSignInIntent();
         startActivityForResult(saveCall, intent, REQUEST_SIGN_IN);
     }
     
-
     // Evento generado cuando se hace login
     @Override
     protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
@@ -98,17 +89,17 @@ public class PlayGames extends Plugin {
             if (result.isSuccess()) {
                 // The signed in account is stored in the result.
                 GoogleSignInAccount signedInAccount = result.getSignInAccount();
-                mPlayersClient = Games.getPlayersClient((Activity) this.getBridge().getContext(), signedInAccount);
-                Games.getGamesClient(this.bridge.getContext(), signedInAccount).setGravityForPopups(Gravity.TOP);
-                playGamesUtils.signInSuccess(mPlayersClient);
+            
+                // Obtenemos los datos del cliente y lo enviamos
+                playGamesUtils.signInSuccess(signedInAccount);
                
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
-                    message = "Game Services no disponible";
+                    message = "Puede que hayas puesto mal los datos del manifest.xml o el games-ids.xml\n" +
+                        "O simplemente no se ha hecho login";
                 }
-                new AlertDialog.Builder(this.getBridge().getContext()).setMessage(message + " - " + result.getStatus().getStatusMessage())
-                    .setNeutralButton(android.R.string.ok, null).show();
+                Log.e("ERROR", message);
             }
         }
     }
@@ -117,13 +108,16 @@ public class PlayGames extends Plugin {
     public void signOut(final PluginCall call) {
         GoogleSignInClient signInClient = GoogleSignIn.getClient(this.getBridge().getContext(),
             GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+        
         signInClient.signOut().addOnCompleteListener((Activity) this.getBridge().getContext(),
             new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     // at this point, the user is signed out.
-                    mPlayersClient = null;
-                    System.out.println("El usuario ha hecho logout");
+                    JSObject info = new JSObject();
+                    info.put("login", false);
+
+                    call.resolve(info);
                 }
             });
     }
