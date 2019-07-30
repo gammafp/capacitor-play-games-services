@@ -9,7 +9,6 @@ import com.getcapacitor.PluginCall;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.Player;
-import com.google.android.gms.games.PlayerLevelInfo;
 import com.google.android.gms.games.PlayersClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

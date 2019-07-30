@@ -3,13 +3,11 @@
     <!-- app_id -->
     <string name="app_id" translatable="false">278354095439</string>
     <!-- package_name -->
-    <string name="package_name" translatable="false">com.gamma.game</string>
+    <string name="package_name" translatable="false">com.gamma.game1</string>
     <!-- achievement Logro - Inicial -->
     <string name="achievement_logro__inicial" translatable="false">CgkIz9rJ-YwIEAIQAg</string>
     <!-- achievement Segundo - logro -->
     <string name="achievement_segundo__logro" translatable="false">CgkIz9rJ-YwIEAIQAw</string>
-    <!-- leaderboard Prueba_leaderboard -->
-    <string name="leaderboard_prueba_leaderboard" translatable="false">CgkIz9rJ-YwIEAIQAQ</string>
-
-    <integer name="google_play_services_version">12451000</integer>
+    <!-- leaderboard carajo -->
+    <string name="leaderboard_carajo" translatable="false">CgkIz9rJ-YwIEAIQBw</string>
 </resources>
