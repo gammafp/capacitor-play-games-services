@@ -195,7 +195,6 @@ public class PlayGames extends Plugin {
     // TODO: Hacer que se acceda correctamente
     @PluginMethod()
     public void submitScore(final PluginCall call) {
-        System.out.println("Se ingresan datos");
         // Show leaderboard
         String leaderboard_id = call.getString("leaderboard_id");
         int points = call.getInt("points", 0);
@@ -209,7 +208,7 @@ public class PlayGames extends Plugin {
             if(status) {
                 System.out.println("------> Leaderboard_id " + leaderboard_id);
                 Games.getLeaderboardsClient((Activity) this.getBridge().getContext(), account)
-                    .submitScore(leaderboard_id, 54321);
+                    .submitScore(leaderboard_id, points);
             }
         }
         
