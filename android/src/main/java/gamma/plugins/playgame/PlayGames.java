@@ -17,9 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.games.Games;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 @NativePlugin(requestCodes = PlayGames.REQUEST_SIGN_IN)
@@ -28,9 +26,15 @@ public class PlayGames extends Plugin {
     static final int REQUEST_SIGN_IN = 10001;
     private PlayGamesUtils playGamesUtils;
     
-    // Leaderboard
-    private static final int RC_LEADERBOARD_UI = 9004;
+    // Clases
+    Achievements achievements;
+    Leaderboard leaderboard;
     
+    @Override
+    public void handleOnStart() {
+        achievements = new Achievements(this);
+        leaderboard = new Leaderboard(this);
+    }
     
     @PluginMethod()
     public void signInSilently(final PluginCall call) {
@@ -146,74 +150,31 @@ public class PlayGames extends Plugin {
     // Leaderboard
     @PluginMethod()
     public void showAllLeaderboard(final PluginCall call) {
-        GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this.getBridge().getContext());
-
-        Boolean status = GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray());
-
-        if(status) {
-            Games.getLeaderboardsClient((Activity) this.getBridge().getContext(), 
-                GoogleSignIn.getLastSignedInAccount(this.getBridge().getContext()))
-                    .getAllLeaderboardsIntent()                    
-                    .addOnSuccessListener(new OnSuccessListener<Intent>() {
-                    @Override
-                    public void onSuccess(Intent intent) {
-                        startActivityForResult(call, intent, RC_LEADERBOARD_UI);
-                    }
-                });
-        }
+        leaderboard.showAllLeaderboard(call);
     }
     
     @PluginMethod()
     public void showLeaderboard(final PluginCall call) {
-        GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this.getBridge().getContext());
-
-        Boolean status = GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray());
-        
-        // Show leaderboard
-        String leaderboard_id = call.getString("leaderboard_id");
-        
-        if(leaderboard_id != null) {
-            if(status) {
-                
-                Games.getLeaderboardsClient((Activity) this.getBridge().getContext(), account)
-                    .getLeaderboardIntent(leaderboard_id)
-                    .addOnSuccessListener(new OnSuccessListener<Intent>() {
-                        @Override
-                        public void onSuccess(Intent intent) {
-                            startActivityForResult(call, intent, RC_LEADERBOARD_UI);
-                        }
-                    });
-                
-            }
-        } else {
-            System.out.println("No se ha ingresado el id de la tabla");
-        }
+        leaderboard.showLeaderboard(call);
     }
     
-    // TODO: Hacer que se acceda correctamente
     @PluginMethod()
     public void submitScore(final PluginCall call) {
-        // Show leaderboard
-        String leaderboard_id = call.getString("leaderboard_id");
-        int points = call.getInt("points", 0);
-        
-        GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this.getBridge().getContext());
+        leaderboard.submitScore(call);        
+    }
 
-        Boolean status = GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray());
-        
-        if(leaderboard_id != null) {
-            if(status) {
-                System.out.println("------> Leaderboard_id " + leaderboard_id);
-                Games.getLeaderboardsClient((Activity) this.getBridge().getContext(), account)
-                    .submitScore(leaderboard_id, points);
-            }
-        }
-        
+    // Achievement
+    @PluginMethod()
+    public void showAchievements(final PluginCall call) {
+        achievements.showAchievements(call);
+    }
+    
+    // Nos ayuda a separar el código
+    @Override
+    public void startActivityForResult(PluginCall call, Intent intent, int resultCode) {
+        super.startActivityForResult(call, intent, resultCode);
     }
     
 
-
+    
 }
