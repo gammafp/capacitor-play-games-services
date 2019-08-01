@@ -16,7 +16,10 @@ export interface PlayGamesPlugin {
     signInSilently(): Promise<IGoogleSignIn>;
     signOut(): Promise<{ login: boolean }>;
     signStatus(): Promise<{ login: boolean }>;
-    showLeaderboard(leaderboard: { leaderboard_id: string; }): Promise<{ login: boolean }>;
+    showLeaderboard(leaderboard: { id: string; }): Promise<{ login: boolean }>;
     showAllLeaderboard(): void;
-    submitScore(leaderboard: { leaderboard_id: string; points: number; }): void;
+    submitScore(leaderboard: { id: string; points: number; }): void;
+    showAchievements(): void;
+    unlockAchievement(unlockAchievement: { id: string }): void;
+    incrementAchievement(incrementAchievement: { id: string, step: number }): void;
 }
