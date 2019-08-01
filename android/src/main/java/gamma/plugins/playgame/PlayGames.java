@@ -169,6 +169,16 @@ public class PlayGames extends Plugin {
         achievements.showAchievements(call);
     }
     
+    @PluginMethod()
+    public void unlockAchievement(final PluginCall call) {
+        achievements.unlockAchievement(call);
+    }
+    
+    @PluginMethod()
+    public void incrementAchievement(final PluginCall call) {
+        achievements.incrementAchievement(call);
+    }
+    
     // Nos ayuda a separar el código
     @Override
     public void startActivityForResult(PluginCall call, Intent intent, int resultCode) {

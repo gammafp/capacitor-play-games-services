@@ -63,7 +63,7 @@ public class Leaderboard {
             }
         } else {
             Log.w("WARNING", "The provider leaderboard id is required");
-            call.reject("The provider id is required");
+            call.reject("The provider leaderboard id is required");
         }
     }
     
