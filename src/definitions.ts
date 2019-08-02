@@ -22,4 +22,5 @@ export interface PlayGamesPlugin {
     showAchievements(): void;
     unlockAchievement(unlockAchievement: { id: string }): void;
     incrementAchievement(incrementAchievement: { id: string, step: number }): void;
+    showSavedGamesUI(): void;
 }

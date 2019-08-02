@@ -17,8 +17,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.drive.Drive;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import java.util.Calendar;
 
 @NativePlugin(requestCodes = PlayGames.REQUEST_SIGN_IN)
 public class PlayGames extends Plugin {
@@ -29,11 +32,13 @@ public class PlayGames extends Plugin {
     // Clases
     Achievements achievements;
     Leaderboard leaderboard;
+    SaveGame savegame;
     
     @Override
     public void handleOnStart() {
         achievements = new Achievements(this);
         leaderboard = new Leaderboard(this);
+        savegame = new SaveGame(this);
     }
     
     @PluginMethod()
@@ -43,7 +48,10 @@ public class PlayGames extends Plugin {
         playGamesUtils = new PlayGamesUtils((Activity) this.getBridge().getContext(), call);
         
         // Obtenemos el tipo de login google o google games
-        GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
+        GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+            .requestScopes(Drive.SCOPE_APPFOLDER)
+            .build();
+        
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this.getBridge().getContext());
 
         // Comprobamos si ya se ha hecho login anteriormente
@@ -81,9 +89,12 @@ public class PlayGames extends Plugin {
     
     private void startSignInIntent() {
         PluginCall saveCall = getSavedCall();
+
+        GoogleSignInOptions  signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+                .requestScopes(Drive.SCOPE_APPFOLDER)
+                .build();
         
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(this.getBridge().getContext(), 
-            GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+        GoogleSignInClient signInClient = GoogleSignIn.getClient(this.getBridge().getContext(), signInOptions);
         
         Intent intent = signInClient.getSignInIntent();
         startActivityForResult(saveCall, intent, REQUEST_SIGN_IN);
@@ -116,9 +127,11 @@ public class PlayGames extends Plugin {
     }
     
     @PluginMethod()
-    public void signStatus(final PluginCall call) {
-        
-        GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
+    public boolean signStatus(final PluginCall call) {
+
+        GoogleSignInOptions  signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+            .requestScopes(Drive.SCOPE_APPFOLDER)
+            .build();
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this.getBridge().getContext());
         
         Boolean status = GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray());
@@ -127,12 +140,17 @@ public class PlayGames extends Plugin {
         info.put("login", status);
 
         call.resolve(info);
+        
+        return status;
     }
 
     @PluginMethod()
     public void signOut(final PluginCall call) {
+        GoogleSignInOptions  signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+            .requestScopes(Drive.SCOPE_APPFOLDER)
+            .build();
         GoogleSignInClient signInClient = GoogleSignIn.getClient(this.getBridge().getContext(),
-            GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+            signInOptions);
         
         signInClient.signOut().addOnCompleteListener((Activity) this.getBridge().getContext(),
             new OnCompleteListener<Void>() {
@@ -185,6 +203,12 @@ public class PlayGames extends Plugin {
         super.startActivityForResult(call, intent, resultCode);
     }
     
-
+    
+    // Google drive save
+    @PluginMethod()
+    public void showSavedGamesUI(final PluginCall call) {
+        this.savegame.showSavedGamesUI(call);
+    }
+    
     
 }
