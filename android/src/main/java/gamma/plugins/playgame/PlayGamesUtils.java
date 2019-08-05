@@ -18,9 +18,12 @@ public class PlayGamesUtils {
     private PluginCall call;
     private Activity activity_plugin;
     
-    public PlayGamesUtils(Activity activity, PluginCall Call) {
+    private PlayGames plugin;
+    
+    public PlayGamesUtils(PlayGames Plugin, PluginCall Call) {
+        plugin = Plugin;
         call = Call;
-        activity_plugin = activity;
+        activity_plugin = (Activity) Plugin.getBridge().getContext();
     }
     
     // Nos ayudará a devolver el signIn cuando esté completo
@@ -51,8 +54,9 @@ public class PlayGamesUtils {
                     Games.getGamesClient(activity_plugin, signedInAccount).setViewForPopups(
                         activity_plugin.getWindow().getDecorView().findViewById(android.R.id.content)
                     );
-                    
+
                     JSObject info = new JSObject();
+                    
                     info.put("id", id);
                     info.put("display_name", displayName);
                     info.put("icon", icon);

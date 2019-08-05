@@ -13,7 +13,7 @@ export interface IGoogleSignIn {
 }
 
 export interface PlayGamesPlugin {
-    signInSilently(): Promise<IGoogleSignIn>;
+    auth(): Promise<IGoogleSignIn>;
     signOut(): Promise<{ login: boolean }>;
     signStatus(): Promise<{ login: boolean }>;
     showLeaderboard(leaderboard: { id: string; }): Promise<{ login: boolean }>;
@@ -22,5 +22,13 @@ export interface PlayGamesPlugin {
     showAchievements(): void;
     unlockAchievement(unlockAchievement: { id: string }): void;
     incrementAchievement(incrementAchievement: { id: string, step: number }): void;
-    showSavedGamesUI(): void;
+    showSavedGames(): Promise<{ login?: boolean, save_game: JSON }>;
+    saveGame(saveGame: {
+        save_name: string;
+        description: string;
+        data: string;
+    }): Promise<{ status?: boolean, save_status: boolean}>;
+    loadGame(loadGame: {
+        load_name: string;
+    }): Promise<{ status?: boolean, save_game: JSON }>;
 }

@@ -23,7 +23,7 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.Calendar;
 
-@NativePlugin(requestCodes = PlayGames.REQUEST_SIGN_IN)
+@NativePlugin(requestCodes = { PlayGames.REQUEST_SIGN_IN, SaveGame.RC_SAVED_GAMES })
 public class PlayGames extends Plugin {
 
     static final int REQUEST_SIGN_IN = 10001;
@@ -42,10 +42,10 @@ public class PlayGames extends Plugin {
     }
     
     @PluginMethod()
-    public void signInSilently(final PluginCall call) {
+    public void auth(final PluginCall call) {
         
         saveCall(call);
-        playGamesUtils = new PlayGamesUtils((Activity) this.getBridge().getContext(), call);
+        playGamesUtils = new PlayGamesUtils(this, call);
         
         // Obtenemos el tipo de login google o google games
         GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
@@ -105,6 +105,10 @@ public class PlayGames extends Plugin {
     protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
         super.handleOnActivityResult(requestCode, resultCode, data);
         
+        if(requestCode == SaveGame.RC_SAVED_GAMES) {
+            savegame.handleOnActivityResult(requestCode, resultCode, data);
+        }
+        
         if (requestCode == REQUEST_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
           
@@ -141,6 +145,15 @@ public class PlayGames extends Plugin {
 
         call.resolve(info);
         
+        return status;
+    }
+
+    public boolean signStatusLocal() {
+        GoogleSignInOptions  signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+            .requestScopes(Drive.SCOPE_APPFOLDER)
+            .build();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this.getBridge().getContext());
+        Boolean status = GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray());
         return status;
     }
 
@@ -206,8 +219,27 @@ public class PlayGames extends Plugin {
     
     // Google drive save
     @PluginMethod()
-    public void showSavedGamesUI(final PluginCall call) {
+    public void showSavedGames(final PluginCall call) {
         this.savegame.showSavedGamesUI(call);
+    }
+    
+    @PluginMethod()
+    public void saveGame(final PluginCall call) {
+        this.saveCall(call);
+        
+        String snapshot_name = call.getString("save_name", "gamma_game");
+        String description = call.getString("description", "description");
+        String data = call.getString("data", "no_data");
+        
+        this.savegame.saveSnapshot(snapshot_name, data, description, "image_name");
+    }
+    
+    @PluginMethod()
+    public void loadGame(final PluginCall call) {
+        this.saveCall(call);
+        
+        String snapshot_name = call.getString("load_name", "gamma_game");
+        this.savegame.requestLoadSnapshot(snapshot_name);
     }
     
     
