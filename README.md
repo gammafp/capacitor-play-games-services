@@ -1,25 +1,69 @@
 # capacitor-play-games-services
 Capacitor Play Games Services is a native Google Play Games Services implementation for Android. 
 
+1) Para poder usar este plugin es necesario descargarlo al proyecto con npm:
 
+```bash
+> npm i capacitor-play-games-services
+```
 
-Para integrar la aplicacion con con google play games services, debes generar el arhivo 
-games_ids.xml en tu cuenta de google play y pegarlo en main/res/values de tu proyecto
-android.
+2) Una vez descargado se tiene que actualizar el proyecto para que reconozca el plugin: 
+
+```bash
+> npx cap update && npx cap sync
+```
+
+3) Abre Android Studio y registra el plugin en tu proyecto de Android.
+    - Ve a **android > app > src > main > java > nombre de dominio de tu proyecto > MainActivity.java**
+    - Agrega el plugin a tu MainActivity, ejemplo:
+```java
+package com.xx.xx;
+
+...
+
+import gamma.plugins.playgame.PlayGames;
+
+public class MainActivity extends BridgeActivity {
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    // ...
+    this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
+        // ...
+        add(PlayGames.class);
+    }});
+  }
+}
+```
+
+4) Ingresar **games-ids.xml** a tu proyecto: 
+    - Ve a tu consola de google play games services (esto lo deberías saber) y clica en logros o marcadores y abajo te saldrá la opción de obtener recursos:
+
+    ![Recursos](https://i.gyazo.com/1c9b2be5c6563c30631fe0f49454e68e.png "Recursos")
+
+    - En **Android Studio** ve al plugin **capacitor-play-games-services > res > values** y agrega el **games-ids.xml**
+
+#### Felicidades ya tienes tu plugin agregado en tu proyecto de android
+
+--- 
+
+## Integración en TypeScript:
 
 Para integrarlo en tu proyecto javascript, debes importar el modulo del capacitor y
 lugo obtener el plugin.
 
 ```javascript
 import { Plugins } from '@capacitor/core';
-import { PlayGamesPlugin } from 'capacitor-play-games-services/src';
+import { PlayGamesPlugin } from 'capacitor-play-games-services';
 const playGames = Plugins.PlayGames as PlayGamesPlugin;
 ```
+
+--- 
 ### Métodos
 
-#### Login - signin
+### Login - signin
 
-Autenticar:
+Autenticar
 ```javascript
 playGames.auth().then((response) => {
     /* response return: 
@@ -32,7 +76,7 @@ playGames.auth().then((response) => {
 });
 ```
 
-Obtener el estado de la conexión:
+Obtener el estado de la conexión
 ```javascript
 playGames.signStatus().then((response) => {
     /* response return: 
@@ -41,7 +85,7 @@ playGames.signStatus().then((response) => {
 });
 ```
 
-Logout: 
+Logout
 ```javascript
 playGames.signOut().then((response) => {
     /* response return: 
@@ -49,8 +93,9 @@ playGames.signOut().then((response) => {
     */
 });
 ```
+---
 
-#### Leaderboard
+### Leaderboard
 
 Mostrar todos los tablero de puntuación
 ```javascript
@@ -71,10 +116,10 @@ playGames.submitScore({
     points: 10 // int value
 });
 ```
+---
+### Medallas
 
-#### Medallas
-
-Mostrar todas las medallas: 
+Mostrar todas las medallas
 ```javascript
 playGames.showAchievements();
 ```
@@ -86,7 +131,7 @@ playGames.unlockAchievement({
 });
 ```
 
-Incrementar una medalla: 
+Incrementar una medalla:
 Nota: Puedes poner una medalla que por medio de cierta cantidades de veces que es precionado o activado cierta actividad la medalla sea habilitada. 
 ```javascript
 playGames.incrementAchievement({
@@ -94,7 +139,8 @@ playGames.incrementAchievement({
     step: 1
 });
 ```
-#### Save game
+---
+### Save game
 
 Mostrar las partidas guardadas por medio del UI de google
 
