@@ -17,10 +17,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.drive.Drive;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-@NativePlugin(requestCodes = PlayGames.REQUEST_SIGN_IN)
+import java.util.Calendar;
+
+@NativePlugin(requestCodes = { PlayGames.REQUEST_SIGN_IN, SaveGame.RC_SAVED_GAMES })
 public class PlayGames extends Plugin {
 
     static final int REQUEST_SIGN_IN = 10001;
@@ -29,21 +32,26 @@ public class PlayGames extends Plugin {
     // Clases
     Achievements achievements;
     Leaderboard leaderboard;
+    SaveGame savegame;
     
     @Override
     public void handleOnStart() {
         achievements = new Achievements(this);
         leaderboard = new Leaderboard(this);
+        savegame = new SaveGame(this);
     }
     
     @PluginMethod()
-    public void signInSilently(final PluginCall call) {
+    public void auth(final PluginCall call) {
         
         saveCall(call);
-        playGamesUtils = new PlayGamesUtils((Activity) this.getBridge().getContext(), call);
+        playGamesUtils = new PlayGamesUtils(this, call);
         
         // Obtenemos el tipo de login google o google games
-        GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
+        GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+            .requestScopes(Drive.SCOPE_APPFOLDER)
+            .build();
+        
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this.getBridge().getContext());
 
         // Comprobamos si ya se ha hecho login anteriormente
@@ -81,9 +89,12 @@ public class PlayGames extends Plugin {
     
     private void startSignInIntent() {
         PluginCall saveCall = getSavedCall();
+
+        GoogleSignInOptions  signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+                .requestScopes(Drive.SCOPE_APPFOLDER)
+                .build();
         
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(this.getBridge().getContext(), 
-            GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+        GoogleSignInClient signInClient = GoogleSignIn.getClient(this.getBridge().getContext(), signInOptions);
         
         Intent intent = signInClient.getSignInIntent();
         startActivityForResult(saveCall, intent, REQUEST_SIGN_IN);
@@ -93,6 +104,10 @@ public class PlayGames extends Plugin {
     @Override
     protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
         super.handleOnActivityResult(requestCode, resultCode, data);
+        
+        if(requestCode == SaveGame.RC_SAVED_GAMES) {
+            savegame.handleOnActivityResult(requestCode, resultCode, data);
+        }
         
         if (requestCode == REQUEST_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
@@ -116,9 +131,11 @@ public class PlayGames extends Plugin {
     }
     
     @PluginMethod()
-    public void signStatus(final PluginCall call) {
-        
-        GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
+    public boolean signStatus(final PluginCall call) {
+
+        GoogleSignInOptions  signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+            .requestScopes(Drive.SCOPE_APPFOLDER)
+            .build();
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this.getBridge().getContext());
         
         Boolean status = GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray());
@@ -127,12 +144,26 @@ public class PlayGames extends Plugin {
         info.put("login", status);
 
         call.resolve(info);
+        
+        return status;
+    }
+
+    public boolean signStatusLocal() {
+        GoogleSignInOptions  signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+            .requestScopes(Drive.SCOPE_APPFOLDER)
+            .build();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this.getBridge().getContext());
+        Boolean status = GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray());
+        return status;
     }
 
     @PluginMethod()
     public void signOut(final PluginCall call) {
+        GoogleSignInOptions  signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+            .requestScopes(Drive.SCOPE_APPFOLDER)
+            .build();
         GoogleSignInClient signInClient = GoogleSignIn.getClient(this.getBridge().getContext(),
-            GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+            signInOptions);
         
         signInClient.signOut().addOnCompleteListener((Activity) this.getBridge().getContext(),
             new OnCompleteListener<Void>() {
@@ -185,6 +216,31 @@ public class PlayGames extends Plugin {
         super.startActivityForResult(call, intent, resultCode);
     }
     
-
+    
+    // Google drive save
+    @PluginMethod()
+    public void showSavedGames(final PluginCall call) {
+        this.savegame.showSavedGamesUI(call);
+    }
+    
+    @PluginMethod()
+    public void saveGame(final PluginCall call) {
+        this.saveCall(call);
+        
+        String snapshot_name = call.getString("save_name", "gamma_game");
+        String description = call.getString("description", "description");
+        String data = call.getString("data", "no_data");
+        
+        this.savegame.saveSnapshot(snapshot_name, data, description, "image_name");
+    }
+    
+    @PluginMethod()
+    public void loadGame(final PluginCall call) {
+        this.saveCall(call);
+        
+        String snapshot_name = call.getString("load_name", "gamma_game");
+        this.savegame.requestLoadSnapshot(snapshot_name);
+    }
+    
     
 }
