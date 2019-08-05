@@ -1,31 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- app_id -->
-    <string name="app_id" translatable="false">278354095439</string>
-    <!-- package_name -->
-    <string name="package_name" translatable="false">com.gamma.game1</string>
-    <!-- achievement Logro - Inicial -->
-    <string name="achievement_logro__inicial" translatable="false">CgkIz9rJ-YwIEAIQAg</string>
-    <!-- achievement Segundo - logro -->
-    <string name="achievement_segundo__logro" translatable="false">CgkIz9rJ-YwIEAIQAw</string>
-    <!-- achievement Pasos -->
-    <string name="achievement_pasos" translatable="false">CgkIz9rJ-YwIEAIQEg</string>
-    <!-- achievement Logro demostración -->
-    <string name="achievement_logro_demostracin" translatable="false">CgkIz9rJ-YwIEAIQEw</string>
-    <!-- achievement Pasos de demostración -->
-    <string name="achievement_pasos_de_demostracin" translatable="false">CgkIz9rJ-YwIEAIQFA</string>
-    <!-- achievement contador -->
-    <string name="achievement_contador" translatable="false">CgkIz9rJ-YwIEAIQFQ</string>
-    <!-- achievement LOGRO_CONTADOR_FINAL -->
-    <string name="achievement_logro_contador_final" translatable="false">CgkIz9rJ-YwIEAIQFg</string>
-    <!-- leaderboard marcador5 -->
-    <string name="leaderboard_marcador5" translatable="false">CgkIz9rJ-YwIEAIQDA</string>
-    <!-- leaderboard marcador6 -->
-    <string name="leaderboard_marcador6" translatable="false">CgkIz9rJ-YwIEAIQDQ</string>
-    <!-- leaderboard marcador7 -->
-    <string name="leaderboard_marcador7" translatable="false">CgkIz9rJ-YwIEAIQDg</string>
-    <!-- leaderboard marcador8 -->
-    <string name="leaderboard_marcador8" translatable="false">CgkIz9rJ-YwIEAIQDw</string>
-    <!-- leaderboard Marcador_pruebas_final -->
-    <string name="leaderboard_marcador_pruebas_final" translatable="false">CgkIz9rJ-YwIEAIQEQ</string>
+    <string name="app_id" translatable="false"></string>
+ 
 </resources>
