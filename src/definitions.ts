@@ -1,34 +1,33 @@
-declare global {
-    interface PluginRegistry {
-        PlayGames: PlayGamesPlugin;
-    }
-}
+import type { PluginListenerHandle } from '@capacitor/core';
 
 export interface IGoogleSignIn {
-    id: string;
-    display_name: string;
-    icon: string;
-    title: string;
-    login: boolean;
+    id?: string;
+    display_name?: string;
+    icon?: string;
+    title?: string;
+    message?: string;
+    isLogin: boolean;
 }
 
 export interface PlayGamesPlugin {
-    auth(): Promise<IGoogleSignIn>;
-    signOut(): Promise<{ login: boolean }>;
-    signStatus(): Promise<{ login: boolean }>;
-    showLeaderboard(leaderboard: { id: string; }): Promise<{ login: boolean }>;
+    // echo(): Promise<{ value: string }>;
+    login(): Promise<IGoogleSignIn>;
+    status(): Promise<{ isLogin: boolean }>;
+    showLeaderboard(leaderboard: { id: string; }): void;
     showAllLeaderboard(): void;
-    submitScore(leaderboard: { id: string; points: number; }): void;
+    submitScore(leaderboard: { id: string; score: number; }): void;
+  
+    unLockAchievement(achievement: { id: string; }): void;
     showAchievements(): void;
-    unlockAchievement(unlockAchievement: { id: string }): void;
-    incrementAchievement(incrementAchievement: { id: string, step: number }): void;
-    showSavedGames(): Promise<{ login?: boolean, save_game: JSON }>;
-    saveGame(saveGame: {
-        save_name: string;
-        description: string;
-        data: string;
-    }): Promise<{ status?: boolean, save_status: boolean}>;
-    loadGame(loadGame: {
-        load_name: string;
-    }): Promise<{ status?: boolean, save_game: JSON }>;
+
+    addListener(
+        eventName: 'onSignInStatus',
+        listenerFunc: (data: IGoogleSignIn) => void,
+    ): PluginListenerHandle;
+
+    removeListener(
+        eventName: 'onSignInStatus',
+        listenerFunc: (data: IGoogleSignIn) => void,
+    ): void;
+
 }
