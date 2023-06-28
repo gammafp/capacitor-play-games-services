@@ -1,6 +1,6 @@
 {
   "name": "capacitor-play-games-services",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "description": "Capacitor Play Games Services is a native Google Play Games Services implementation for Android.",
   
   "main": "dist/plugin.cjs.js",
@@ -38,7 +38,7 @@
     "eslint": "eslint . --ext ts",
     "prettier": "prettier \"**/*.{css,html,ts,js,java}\"",
     "swiftlint": "node-swiftlint",
-    "docgen": "docgen --api PlayGamesPluginPlugin --output-readme README.md --output-json dist/docs.json",
+    "docgen": "docgen --api PlayGamesPlugin --output-readme README.md --output-json dist/docs.json",
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",

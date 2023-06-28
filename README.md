@@ -1,21 +1,21 @@
 # capacitor-play-games-services
 Capacitor Play Games Services is a native Google Play Games Services implementation for Android. 
 
-1) Para poder usar este plugin es necesario descargarlo al proyecto con npm:
+1) To be able to use this plugin it is necessary to download it to the project with npm:
 
 ```bash
 > npm i capacitor-play-games-services
 ```
 
-2) Una vez descargado se tiene que actualizar el proyecto para que reconozca el plugin: 
+2) Once downloaded you have to update the project to recognize the plugin: 
 
 ```bash
 > npx cap update && npx cap sync
 ```
 
-3) Abre Android Studio y registra el plugin en tu proyecto de Android.
-    - Ve a **android > app > src > main > java > nombre de dominio de tu proyecto > MainActivity.java**
-    - Agrega el plugin a tu MainActivity, ejemplo:
+3) Open Android Studio and register the plugin in your Android project.
+    - Go to **android > app > src > main > java > domain name of your project > MainActivity.java**
+    - Add the plugin to your MainActivity, example:
 ```java
 package com.xx.xx;
 
@@ -34,42 +34,43 @@ public class MainActivity extends BridgeActivity {
     }
 }
 ```
-4) Ingresar **games-ids.xml** a tu proyecto: 
-    - Ve a tu consola de google play games services (esto lo deberías saber) y clica en logros o marcadores y abajo te saldrá la opción de obtener recursos:
+4) Add **games id** to your project: 
+    - Go to your google play games services console (you should know this) and click on achievements or markers and below you will see the option to obtain resources:
 
     ![Recursos](https://i.gyazo.com/1c9b2be5c6563c30631fe0f49454e68e.png "Recursos")
 
-    - Cuando obtengas los recursos obten el número id y copialo.
+    - When you get the resources get the id number and copy it.
     ![Recursos](https://i.gyazo.com/d2ad93555aa0db1550752b50bf53b687.png "app_id")
-    - En **Android Studio** ve al plugin **capacitor-play-games-services > res > values > string.xml** agrega el app_id.
+    - In **Android Studio** go to plugin **capacitor-play-games-services > res > values > string.xml** and add the app_id.
     ![app_id](https://i.gyazo.com/167075c1a5ef219e967ea04d9a8b9e57.png "app_id")
 
-#### Felicidades ya tienes tu plugin agregado en tu proyecto de android
+#### Congratulations, you already have your plugin added to your android project
 
 --- 
 
-## Integración en TypeScript:
+## TypeScript integration:
 
-Para integrarlo en tu proyecto javascript, debes importar el modulo del capacitor y
-lugo obtener el plugin.
+To integrate it into your javascript project, you must import the capacitor module and
+then get the plugin.
 
 ```javascript
 import { PlayGames } from 'capacitor-play-games-services/src';
 ```
 
 --- 
-## Métodos
+## Methods
 
 ### Login - signin
 
-Poner en escucha un evento de cambios
+Listen for a change event:
+(this is interesting to listen the first login event)
 ```typescript
 PlayGames.addListener("onSignInStatus", (res) => {
     setLoginData(JSON.stringify(res, null, 4));
 })
 ```
 
-### Hacer Login
+### Login
 ```typescript
 playGames.login().then((response) => {
     /* response return: 
@@ -83,7 +84,7 @@ playGames.login().then((response) => {
 });
 ```
 
-### Obtener el estado de la conexión
+### Get connection status
 ```typescript
 PlayGames.status().then((response) => {
     /* response return:
@@ -101,19 +102,19 @@ this method has been removed by google.
 
 ## Leaderboard
 
-### Mostrar todos los tablero de puntuación
+### Show all leaderboard
 ```typescript
 PlayGames.showAllLeaderboard();
 ```
 
-### Mostrar un tablero de puntuación determinado
+### Show one leaderboard by id
 ```typescript
 PlayGames.showLeaderboard({
     id: 'XXXXXXXX-XXXXXXXX' // id of your leaderboard
 });
 ```
 
-### Meter puntos a un tablero de puntuaciones
+### Add points to leaderboard
 ```typescript
 PlayGames.submitScore({
     id: 'XXXXXXXX-XXXXXXXX' // id of your leaderboard,
@@ -121,16 +122,18 @@ PlayGames.submitScore({
 });
 ```
 ---
-### Medallas
 
-Mostrar todas las medallas
+### Medals
+Show all medals
 ```typescript
 PlayGames.showAchievements();
 ```
 
-### Desbloquear una medalla
+### Unlock one medal
 ```typescript
 PlayGames.unlockAchievement({
     id: 'XXXXXXXX-XXXXXXXX' // id of your achievement
 });
 ```
+
+## IMPORTANT: For testings you need sign your app.
