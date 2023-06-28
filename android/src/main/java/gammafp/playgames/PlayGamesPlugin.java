@@ -46,14 +46,12 @@ public class PlayGamesPlugin extends Plugin {
     public void login(PluginCall call) {
         this.savedCall = call;
         checkAuthenticated(PlayGames.getGamesSignInClient(this.getActivity()).signIn());
-        Log.d("PLAYPLUGIN", "LOGINTRY: ");
     }
 
     @PluginMethod()
     public void status(PluginCall call) {
         savedCall = call;
         checkAuthenticated(PlayGames.getGamesSignInClient(this.getActivity()).isAuthenticated());
-        Log.d("PLAYPLUGIN", "status: CHECK STATUS");
     }
 
     private void checkAuthenticated(Task<AuthenticationResult> pTask) {
@@ -118,14 +116,12 @@ public class PlayGamesPlugin extends Plugin {
 
         int score = call.getInt("score");
 
-        Log.d("PLAYPLUGIN", "mete score");
         PlayGames.getLeaderboardsClient(this.getActivity())
                 .submitScore(id, score);
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_NONE)
     public void showAchievements(PluginCall call) {
-        Log.d("PLAYPLUGIN", "MUESTRA ACHIEVEMENTS");
         PlayGames.getAchievementsClient(this.getActivity())
                 .getAchievementsIntent()
                 .addOnSuccessListener(new OnSuccessListener<Intent>() {
@@ -138,14 +134,12 @@ public class PlayGamesPlugin extends Plugin {
 
     @PluginMethod()
     public void unLockAchievement(PluginCall call) {
-        Log.d("PLAYPLUGIN", "--ALL LEADER BOARD--");
         String id = call.getString("id");
         PlayGames.getAchievementsClient(this.getActivity()).unlock(id);
     }
 
     @PluginMethod()
     public void showAllLeaderboard(PluginCall call) {
-        Log.d("PLAYPLUGIN", "--ALL LEADER BOARD--");
         PlayGames
                 .getLeaderboardsClient(getActivity())
                 .getAllLeaderboardsIntent()
@@ -153,7 +147,6 @@ public class PlayGamesPlugin extends Plugin {
                     @Override
                     public void onSuccess(Intent intent) {
                         getActivity().startActivityForResult(intent, RC_LEADERBOARD_UI);
-                        Log.d("PLAYPLUGIN", "onSuccessALL: TODO CORRECTO MOSTRAR ALGO");
                     }
                 });
 
@@ -162,17 +155,14 @@ public class PlayGamesPlugin extends Plugin {
 
     @PluginMethod()
     public void showLeaderboard(PluginCall call) {
-        Log.d("PLAYPLUGIN", "--showLeaderboard--");
 
         String leaderBoardId = call.getString("id");
-        Log.d("PLAYPLUGIN", leaderBoardId);
         PlayGames.getLeaderboardsClient(getActivity())
                 .getLeaderboardIntent(leaderBoardId)
                 .addOnSuccessListener(new OnSuccessListener<Intent>() {
                     @Override
                     public void onSuccess(Intent intent) {
                         getActivity().startActivityForResult(intent, RC_LEADERBOARD_UI);
-                        Log.d("PLAYPLUGIN", "onSuccess: TODO CORRECTO MOSTRAR ALGO");
                     }
                 });
     }
