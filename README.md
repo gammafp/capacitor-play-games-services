@@ -54,7 +54,7 @@ To integrate it into your javascript project, you must import the capacitor modu
 then get the plugin.
 
 ```javascript
-import { PlayGames } from 'capacitor-play-games-services/src';
+import { PlayGames } from 'capacitor-play-games-services';
 ```
 
 --- 
