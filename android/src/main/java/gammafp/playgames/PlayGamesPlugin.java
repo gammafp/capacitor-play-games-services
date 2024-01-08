@@ -37,7 +37,7 @@ public class PlayGamesPlugin extends Plugin {
     @PluginMethod()
     public void echo(PluginCall call) {
         JSObject info = new JSObject();
-        info.put("isLogin", "COJONES");
+        info.put("isLogin", "is login");
         call.resolve(info);
     }
 
